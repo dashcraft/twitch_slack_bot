@@ -5,6 +5,7 @@ const BidiBot = require('../BidiBot');
 const SlackBot = require('../SlackBot');
 const Relay = require('../Relay');
 const SlackStub = require('./stubs/slack.stub');
+const TwitchStub = require('./stubs/twitch.stub');
 const ClientStub = require('./stubs/client.stub');
 const goodJSON = require('./fixtures/goodSlack.config.js');
 const badJSON = require('./fixtures/badSlack.config.js');
@@ -19,7 +20,14 @@ describe('SlackBot', () => {
 		useFakeServer: false
 	});
 
-	
+	// creates a bot via a config file
+	const create = (config) => {
+		const bot = new Bidi(config);
+		bot.slack = new SlackStub();
+		bot.twitch = new TwitchStub();
+		bot.connect();
+		return bot;
+	}
 
 	beforeEach(() => {
 		this.infoStub = sandbox.stub(logger,'info');
@@ -29,7 +37,6 @@ describe('SlackBot', () => {
 	})
 
 
-
 	afterEach(() => {
 		sandbox.restore();
 	})
@@ -37,16 +44,20 @@ describe('SlackBot', () => {
 
 
 	it('should fail to create a bot without full configurations', (config = badJSON, relay =Relay) => {
-		let bot = new BidiBot(config);
+		let _bot = new BidiBot(config);
 
 		chai.assert.isNotOk(bot,"This will pass, if the bot fails to load because it's missing twitch settings");
 	})
 
 	it('should create a new bot if it recieves full configurations', (config = goodJSON, relay =Relay) => {
-		let bot = new BidiBot(config);
+		let _bot = new BidiBot(config);
 
 		chai.assert.isOk(bot.isObject,"This will pass, if the bot fails to load because it's missing twitch settings");
 	})
+
+
+
+
 
 })
 
